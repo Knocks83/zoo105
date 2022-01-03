@@ -1,0 +1,5 @@
+__pycache__
+*.html
+*.xml
+*.json
+infos.txt

@@ -1,0 +1,4 @@
+# Generated with pipreqs
+beautifulsoup4==4.10.0
+python-dotenv==0.19.2
+requests==2.26.0
