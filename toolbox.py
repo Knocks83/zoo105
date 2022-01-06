@@ -1,4 +1,5 @@
 from requests import get, post
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 import xml.etree.ElementTree as ElementTree
 from bs4 import BeautifulSoup
 from json import loads
@@ -28,14 +29,15 @@ def findGUID(episodeURL: str) -> str:
 
     return guid
 
+
 def download(url, filename):
     # Stream the download to avoid saving it to memory
     with get(url, stream=True) as r:
         r.raise_for_status()
         with open(filename, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192): 
+            for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
-    
+
 
 class Telegram:
     def __init__(self, token: str, chatID: str, botAPI='https://api.telegram.org/'):
@@ -53,32 +55,36 @@ class Telegram:
         post(self.botAPI + "bot"+self.token +
              "/sendMessage", params=postParams)
 
-    def sendAudio(self, content: bytes, filename: str):
+    def sendAudio(self, filename: str) -> str:
         # Set post request parameters
-        postParams = {
-            'chat_id': self.chatID,
-            'audio': 'attach://' + filename
-        }
+        multipart = MultipartEncoder(
+            fields={
+                'chat_id': self.chatID,
+                'audio': 'attach://' + filename,
+                filename: (
+                    filename,
+                    open(filename, 'rb')
+                )
+            }
+        )
 
-        # Create a tuple with the contents of the file
-        file = {
-            filename: content
-        }
+        req = post(self.botAPI + "bot"+self.token + "/sendAudio",
+                   data=multipart, headers={'Content-Type': multipart.content_type})
+        return req.content.decode('utf-8')
 
-        post(self.botAPI + "bot"+self.token +
-             "/sendAudio", params=postParams, files=file)
-    
-    def sendVideo(self, content: bytes, filename: str):
+    def sendVideo(self, filename: str) -> str:
         # Set post request parameters
-        postParams = {
-            'chat_id': self.chatID,
-            'audio': 'attach://' + filename
-        }
+        multipart = MultipartEncoder(
+            fields={
+                'chat_id': self.chatID,
+                'video': 'attach://' + filename,
+                filename: (
+                    filename,
+                    open(filename, 'rb')
+                )
+            }
+        )
 
-        # Create a tuple with the contents of the file
-        file = {
-            filename: content
-        }
-
-        post(self.botAPI + "bot"+self.token +
-             "/sendVideo", params=postParams, files=file)
+        req = post(self.botAPI + "bot"+self.token + "/sendVideo",
+                   data=multipart, headers={'Content-Type': multipart.content_type})
+        return req.content.decode('utf-8')

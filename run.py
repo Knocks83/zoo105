@@ -8,8 +8,9 @@ from os import getenv
 from os.path import dirname, realpath
 from dotenv import load_dotenv
 import toolbox
+import logging
 
-
+logging.basicConfig(level=logging.DEBUG)
 # Set basic vars
 websiteURL = "https://zoo.105.net/"
 audioBaseURL = 'http://ms-pod.mediaset.net/repliche//{year:04d}/{month:02d}/{day:02d}/{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo.mp3'
@@ -40,8 +41,7 @@ for episode in videoBox.findAll(class_="box"):
 
 # split the date in different variables to check the date of the last media
 day, month, year = episodeTitles[0].split(' ')[-1].split('-')
-#today = datetime.today()
-today = datetime(year=2021, month=12, day=24)
+today = datetime.today()
 
 if (day == str(today.day) and month == str(today.month) and year == str(today.year)):
     telegram = toolbox.Telegram(getenv('TELEGRAM_API_TOKEN'), getenv(
@@ -53,8 +53,10 @@ if (day == str(today.day) and month == str(today.month) and year == str(today.ye
         day=today.day, month=today.month, year=today.year, daytext=today.strftime("%a").lower())
     
     
-    r = get(audioURL)
-    telegram.sendAudio(r.content, filename+'.mp3')
+    toolbox.download(audioURL, filename+'.mp3')
+    r = telegram.sendAudio(filename+'.mp3')
+    logging.debug(r)
 
-    r = get(videos[0])
-    telegram.sendVideo(r.content, filename+'.mp4')
+    toolbox.download(videos[0], filename+'.mp4')
+    r = telegram.sendVideo(filename+'.mp4')
+    logging.debug(r)
