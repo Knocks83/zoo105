@@ -26,7 +26,7 @@ parser.add_argument('--video', help='Send video file',
                     dest='doSendVideo', default=False, action='store_true')
 arguments = parser.parse_args()
 
-if(not (arguments.doSendAudio and arguments.doSendVideo)):
+if(not (arguments.doSendAudio or arguments.doSendVideo)):
     logging.info('You didn\'t specify any action, run run.py -h')
     exit(0)
 
