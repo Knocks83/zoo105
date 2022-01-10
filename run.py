@@ -26,7 +26,7 @@ parser.add_argument('--video', help='Send video file',
                     dest='doSendVideo', default=False, action='store_true')
 arguments = parser.parse_args()
 
-if(not (arguments['doSendAudio'] and arguments['doSendVideo'])):
+if(not (arguments.doSendAudio and arguments.doSendVideo)):
     logging.info('You didn\'t specify any action, run run.py -h')
     exit(0)
 
@@ -68,12 +68,12 @@ if (day == str(today.day) and month == str(today.month) and year == str(today.ye
     filename = "{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo".format(
         day=today.day, month=today.month, year=today.year, daytext=today.strftime("%a").lower())
 
-    if (arguments['doSendAudio']):
+    if (arguments.doSendAudio):
         toolbox.download(audioURL, filename+'.mp3')
         r = telegram.sendAudio(filename+'.mp3')
         logging.debug(r)
 
-    if (arguments['doSendVideo']):
+    if (arguments.doSendVideo):
         toolbox.download(videos[0], filename+'.mp4')
         r = telegram.sendVideo(filename+'.mp4')
         logging.debug(r)
