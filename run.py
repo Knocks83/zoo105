@@ -7,6 +7,7 @@ from locale import setlocale, LC_ALL
 from os import getenv, remove
 from os.path import dirname, realpath, exists
 from dotenv import load_dotenv
+from time import sleep
 import argparse
 import logging
 import toolbox
@@ -16,7 +17,7 @@ import toolbox
 websiteURL = "https://zoo.105.net/"
 audioBaseURL = 'http://ms-pod.mediaset.net/repliche//{year:04d}/{month:d}/{day:02d}/{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo.mp3'
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 parser = argparse.ArgumentParser()
 
 # Parse CLI arguments
@@ -44,48 +45,59 @@ telegram = toolbox.Telegram(getenv('TELEGRAM_API_TOKEN'), getenv(
 if (arguments.doSendAudio):
     audioURL = audioBaseURL.format(
         day=today.day, month=today.month, year=today.year, daytext=today.strftime("%a").lower())
-    
-    if (head(audioURL).status_code in [200, 302]):
-        toolbox.download(audioURL, filename+'.mp3')
-        r = telegram.sendAudio(filename+'.mp3')
-        logging.debug(r)
 
-        if exists(filename+'.mp3'):
-            remove(filename+'.mp3')
+    tried = 0
+    while not head(audioURL).status_code in [200, 302]:
+        tried += 1
+        if tried >= 10:
+            exit(1)
+        sleep(60)
+    
+    toolbox.download(audioURL, filename+'.mp3')
+    r = telegram.sendAudio(filename+'.mp3')
+    logging.debug(r)
+
+    if exists(filename+'.mp3'):
+        remove(filename+'.mp3')
     else:
         logging.error('Audio not found!')
 
 if (arguments.doSendVideo):
-    # Get and objectify the page
-    page = get(websiteURL)
-    soup = BeautifulSoup(page.content, "html.parser")
+    tried = 0
+    while True:
+        # Get and objectify the page
+        page = get(websiteURL)
+        soup = BeautifulSoup(page.content, "html.parser")
 
-    videos = []
-    episodeTitles = []
+        videos = []
+        episodeTitles = []
 
-    # Find the div that contains the videos
-    videoBox = soup.find(class_="cont_visualizzazione")
+        # Find the div that contains the videos
+        videoBox = soup.find(class_="cont_visualizzazione")
 
-    # Loop through the divs with class box
-    for episode in videoBox.findAll(class_="box"):
-        # Find the webpage of the video and the title
-        episodeURL = episode.find("a")['href']
-        episodeTitles.append(episode.find("a").decode_contents())
+        # Loop through the divs with class box
+        for episode in videoBox.findAll(class_="box"):
+            # Find the webpage of the video and the title
+            episodeURL = episode.find("a")['href']
+            episodeTitles.append(episode.find("a").decode_contents())
 
-        # Find the media url from inside the video webpage
-        guid = toolbox.findGUID(episodeURL)
-        videoURL = toolbox.findDownloadURL(guid)
-        videos.append(videoURL)
+            # Find the media url from inside the video webpage
+            guid = toolbox.findGUID(episodeURL)
+            videoURL = toolbox.findDownloadURL(guid)
+            videos.append(videoURL)
 
-    # split the date in different variables to check the date of the last media
-    day, month, year = episodeTitles[0].split(' ')[-1].split('-')
+        # split the date in different variables to check the date of the last media
+        day, month = episodeTitles[0].split(' ')[1::]
 
-    if (day == str(today.day) and month == str(today.month) and year == str(today.year)):
-        toolbox.download(videos[0], filename+'.mp4')
-        r = telegram.sendVideo(filename+'.mp4')
-        logging.debug(r)
+        if (day == str(today.day) and month.upper() == today.strftime("%B").upper()):
+            toolbox.download(videos[0], filename+'.mp4')
+            r = telegram.sendVideo(filename+'.mp4')
+            logging.debug(r)
 
-        if exists(filename+'.mp4'):
-            remove(filename+'.mp4')
-    else:
-        logging.error('Video not found!')
+            if exists(filename+'.mp4'):
+                remove(filename+'.mp4')
+        else:
+            tried += 1
+            if tried >= 10:
+                exit(1)
+            sleep(60)
