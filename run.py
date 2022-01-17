@@ -21,9 +21,9 @@ logging.basicConfig(level=logging.INFO)
 parser = argparse.ArgumentParser()
 
 # Parse CLI arguments
-parser.add_argument('--audio', help='Send audio file',
+parser.add_argument('-a', '--audio', help='Send audio file',
                     dest='doSendAudio', default=False, action='store_true')
-parser.add_argument('--video', help='Send video file',
+parser.add_argument('-v', '--video', help='Send video file',
                     dest='doSendVideo', default=False, action='store_true')
 arguments = parser.parse_args()
 
