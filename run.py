@@ -1,7 +1,7 @@
 from requests import get, head
 from bs4 import BeautifulSoup
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from locale import setlocale, LC_ALL
 
 from os import getenv, remove
@@ -25,6 +25,8 @@ parser.add_argument('-a', '--audio', help='Send audio file',
                     dest='doSendAudio', default=False, action='store_true')
 parser.add_argument('-v', '--video', help='Send video file',
                     dest='doSendVideo', default=False, action='store_true')
+parser.add_argument('-b', '--before', help='Check the day before instead of current day',
+                    dest='before', default=False, action='store_true')
 arguments = parser.parse_args()
 
 if(not (arguments.doSendAudio or arguments.doSendVideo)):
@@ -42,6 +44,9 @@ filename = "{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo".format(
 telegram = toolbox.Telegram(getenv('TELEGRAM_API_TOKEN'), getenv(
     'TELEGRAM_CHAT_ID'), getenv('TELEGRAM_API_URL'))
 
+if (arguments.before):
+    today = today - timedelta(days=1)
+
 if (arguments.doSendAudio):
     audioURL = audioBaseURL.format(
         day=today.day, month=today.month, year=today.year, daytext=today.strftime("%a").lower())
@@ -52,7 +57,7 @@ if (arguments.doSendAudio):
         if tried >= 10:
             exit(1)
         sleep(60)
-    
+
     toolbox.download(audioURL, filename+'.mp3')
     r = telegram.sendAudio(filename+'.mp3')
     logging.debug(r)
