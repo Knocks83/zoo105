@@ -92,9 +92,9 @@ if (arguments.doSendVideo):
             videos.append(videoURL)
 
         # split the date in different variables to check the date of the last media
-        day, month = episodeTitles[0].split(' ')[1::]
+        day, month = episodeTitles[0].split(' ')[-1].split('-')[:2]
 
-        if (day == str(today.day) and month.upper() == today.strftime("%B").upper()):
+        if (int(day) == today.day and int(month) == today.month):
             toolbox.download(videos[0], filename+'.mp4')
             r = telegram.sendVideo(filename+'.mp4')
             logging.debug(r)
