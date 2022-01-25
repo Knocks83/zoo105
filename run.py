@@ -101,6 +101,7 @@ if (arguments.doSendVideo):
 
             if exists(filename+'.mp4'):
                 remove(filename+'.mp4')
+            break
         else:
             tried += 1
             if tried >= 10:
