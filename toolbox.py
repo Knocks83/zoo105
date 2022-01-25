@@ -77,6 +77,7 @@ class Telegram:
         multipart = MultipartEncoder(
             fields={
                 'chat_id': self.chatID,
+                'supports_streaming': True,
                 'video': 'attach://' + filename,
                 filename: (
                     filename,
