@@ -72,12 +72,13 @@ class Telegram:
                    data=multipart, headers={'Content-Type': multipart.content_type})
         return req.content.decode('utf-8')
 
-    def sendVideo(self, filename: str) -> str:
+    def sendVideo(self, filename: str, caption = '') -> str:
         # Set post request parameters
         multipart = MultipartEncoder(
             fields={
                 'chat_id': self.chatID,
-                'supports_streaming': True,
+                'supports_streaming': 'true',
+                'caption': caption,
                 'video': 'attach://' + filename,
                 filename: (
                     filename,

@@ -96,7 +96,7 @@ if (arguments.doSendVideo):
 
         if (int(day) == today.day and int(month) == today.month):
             toolbox.download(videos[0], filename+'.mp4')
-            r = telegram.sendVideo(filename+'.mp4')
+            r = telegram.sendVideo(filename+'.mp4', 'Lo Zoo di 105 - {day:02d}/{month:02d}/{year:04d}'.format(day=today.day, month=today.month, year=today.year))
             logging.debug(r)
 
             if exists(filename+'.mp4'):
