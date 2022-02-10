@@ -91,10 +91,12 @@ if (arguments.doSendVideo):
             videoURL = toolbox.findDownloadURL(guid)
             videos.append(videoURL)
 
-        # split the date in different variables to check the date of the last media
-        day, month = episodeTitles[0].split(' ')[-1].split('-')[:2]
+        # Check if the title contains the day as digit OR at least the shortened weekday name (lun, mar, mer, gio, ven)
+        check = (str(today.day) in episodeTitles[0]) or (today.strftime("%a").lower() in episodeTitles[0].lower())
+        # Check if the title contains the month as digit OR at least the shortened month name (gen, feb, mar, apr, ...)
+        check = check and ((str(today.month) in episodeTitles[0]) or (today.strftime("%b").lower() in episodeTitles[0].lower()))
 
-        if (int(day) == today.day and int(month) == today.month):
+        if (check):
             toolbox.download(videos[0], filename+'.mp4')
             r = telegram.sendVideo(filename+'.mp4', 'Lo Zoo di 105 - {day:02d}/{month:02d}/{year:04d}'.format(day=today.day, month=today.month, year=today.year))
             logging.debug(r)
