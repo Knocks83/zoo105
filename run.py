@@ -15,7 +15,7 @@ import toolbox
 
 # Set basic vars
 websiteURL = "https://zoo.105.net/"
-audioBaseURL = 'http://ms-pod.mediaset.net/repliche//{year:04d}/{month:d}/{day:02d}/{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo.mp3'
+audioBaseURL = 'http://ms-pod.mediaset.net/repliche//{year:04d}/{month:d}/{day:d}/{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo.mp3'
 
 logging.basicConfig(level=logging.INFO)
 parser = argparse.ArgumentParser()
