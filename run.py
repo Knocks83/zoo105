@@ -16,6 +16,7 @@ import toolbox
 # Set basic vars
 websiteURL = "https://zoo.105.net/"
 audioBaseURL = 'http://ms-pod.mediaset.net/repliche//{year:04d}/{month:d}/{day:d}/{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo.mp3'
+basePath = dirname(realpath(__file__)) + '/'
 
 logging.basicConfig(level=logging.INFO)
 parser = argparse.ArgumentParser()
@@ -33,19 +34,23 @@ if(not (arguments.doSendAudio or arguments.doSendVideo)):
     logging.info('You didn\'t specify any action, run run.py -h')
     exit(0)
 
-
+# Load the configuration from the dotenv file
 load_dotenv(dotenv_path=dirname(realpath(__file__))+'/config.env')
+# Since the day names (lunedì, martedì etc) are in italian, set the locale to italian
 setlocale(LC_ALL, "it_IT.UTF8")
 
+# Get the current day and generate the telegram object
 today = datetime.today()
-filename = "{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo".format(
-    day=today.day, month=today.month, year=today.year, daytext=today.strftime("%a").lower())
-
 telegram = toolbox.Telegram(getenv('TELEGRAM_API_TOKEN'), getenv(
     'TELEGRAM_CHAT_ID'), getenv('TELEGRAM_API_URL'))
 
+# If the script is configured to elaborate a day before, edit the today var
 if (arguments.before):
     today = today - timedelta(days=1)
+
+# After checking the day, calculate the filename of the episode
+filename = basePath + "{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo".format(
+    day=today.day, month=today.month, year=today.year, daytext=today.strftime("%a").lower())
 
 if (arguments.doSendAudio):
     audioURL = audioBaseURL.format(
