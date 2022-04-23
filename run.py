@@ -96,8 +96,12 @@ if (arguments.doSendVideo):
             videoURL = toolbox.findDownloadURL(guid)
             videos.append(videoURL)
 
+        # DUE TO THE FALSE POSITIVES, THIS CHECK HAS BEEN REPLACED BY THE ONE UNDER IT
         # Check if the title contains the day as digit OR at least the shortened weekday name (lun, mar, mer, gio, ven)
-        check = (str(today.day) in episodeTitles[0]) or (today.strftime("%a").lower() in episodeTitles[0].lower())
+        #check = (str(today.day) in episodeTitles[0]) or (today.strftime("%a").lower() in episodeTitles[0].lower())
+        # Check if the title contains the digits of the day
+        check = (str(today.day) in episodeTitles[0])
+
         # Check if the title contains the month as digit OR at least the shortened month name (gen, feb, mar, apr, ...)
         check = check and ((str(today.month) in episodeTitles[0]) or (today.strftime("%b").lower() in episodeTitles[0].lower()))
 
