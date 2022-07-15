@@ -15,7 +15,7 @@ import toolbox
 
 # Set basic vars
 websiteURL = "https://zoo.105.net/"
-audioBaseURL = 'http://ms-pod.mediaset.net/repliche//{year:04d}/{month:d}/{day:d}/{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo.mp3'
+audioBaseURL = 'http://dr-pod.mediaset.net/repliche//{year:04d}/{month:d}/{day:d}/{daytext:s}_{day:02d}{month:02d}{year:04d}_zoo.mp3'
 basePath = dirname(realpath(__file__)) + '/'
 
 logging.basicConfig(level=logging.INFO)
